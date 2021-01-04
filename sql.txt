@@ -1,0 +1,27 @@
+1、查询问题相同的数据
+SELECT
+	question 
+FROM
+	tikuNet 
+GROUP BY
+	question,
+	answer
+HAVING
+	count( question ) > 1
+
+2、删除表中问题和答案相同的记录,只保留rowid最小的一条
+DELETE 
+FROM
+	tiku
+WHERE
+	( tiku.question, tiku.answer ) IN ( SELECT question, answer FROM tiku GROUP BY question, answer HAVING count( * ) > 1 ) 
+	AND rowid NOT IN (
+SELECT
+	min( rowid ) 
+FROM
+	tiku 
+GROUP BY
+	question,
+	answer 
+HAVING
+	count( * ) > 1)

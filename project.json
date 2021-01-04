@@ -1,0 +1,19 @@
+{
+  "assets": [],
+  "build": {
+    "build_id": "99F82FE1-141",
+    "build_number": 141,
+    "build_time": 1608281774894
+  },
+  "useFeatures": [],
+  "icon": "res/logo.png",
+  "launchConfig": {
+    "hideLogs": false
+  },
+  "main": "main.js",
+  "name": "强国助手",
+  "packageName": "com.auto_xxqg",
+  "scripts": {},
+  "versionCode": 20201218,
+  "versionName": "2.19.0"
+}
