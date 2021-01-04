@@ -1,5 +1,5 @@
 importClass(android.database.sqlite.SQLiteDatabase);
-
+var path=files.path("/sdcard/Download/tiku.db");
 function searchTiku(keyw) {
     //表名
     var tableName = "tiku";
@@ -10,14 +10,6 @@ function searchTiku(keyw) {
 
 function searchDb(keyw, _tableName, queryStr) {
     var tableName = _tableName;
-    //数据文件名
-    var dbName = "tiku.db";
-    //文件路径
-    var path = files.path(dbName);
-    //确保文件存在
-    if (!files.exists(path)) {
-        files.createWithDirs(path);
-    }
     //创建或打开数据库
     var db = SQLiteDatabase.openOrCreateDatabase(path, null);
     var query = "";
@@ -48,14 +40,6 @@ function searchDb(keyw, _tableName, queryStr) {
 }
 
 function executeSQL(sqlstr) {
-    //数据文件名
-    var dbName = "tiku.db";
-    //文件路径
-    var path = files.path(dbName);
-    //确保文件存在
-    if (!files.exists(path)) {
-        files.createWithDirs(path);
-    }
     //创建或打开数据库
     var db = SQLiteDatabase.openOrCreateDatabase(path, null);
     db.execSQL(sqlstr);

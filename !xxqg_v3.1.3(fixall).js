@@ -13,7 +13,7 @@ var rTime = 360 + random(5, 10);//广播收听6分 * 60 = 360秒
 
 var commentText = ["支持党，支持国家！", "为实现中华民族伟大复兴而不懈奋斗！", "不忘初心，牢记使命"];//评论内容，可自行修改，大于5个字便计分
 var num = random(0, commentText.length - 1);//随机数
-var xxset = JSON.parse(files.read("/sdcard/Download/config.json"));
+var xxset = JSON.parse(files.read("/sdcard/Download/config.txt"));
 var aCatlog = xxset.article;//文章学习类别，可自定义修改为“要闻”、“新思想”等
 // var aCat = ["推荐", "要闻", "综合"];
 // var aCatlog = aCat[0];//文章学习类别，随机取"推荐","要闻","综合","实践"
@@ -35,6 +35,8 @@ var zsyDelay = 50; //单位为ms毫秒，示例为0-100的随机值，定义争�
 var user = "";
 var path = files.path("/sdcard/Download/tiku.db");
 var update2server = xxset.update2server; //上传到自己的服务器
+var weekdt = xxset.weekdt;
+var specialdt = xxset.specialdt;
 /**
  * @description: 生成从minNum到maxNum的随机数
  * @param: minNum-较小的数
@@ -95,6 +97,12 @@ function getLearnedArticle(title, date) {
     rtitle = title.replace("'", "''");
     //创建或打开数据库
     var db = SQLiteDatabase.openOrCreateDatabase(path, null);
+    var createTable = "\
+    CREATE TABLE IF NOt EXISTS learnedArticles(\
+    title CHAR(253),\
+    date CHAR(100)\
+    );";
+    db.execSQL(createTable);
     var sql = "SELECT * FROM  learnedArticles WHERE title = '" + user + rtitle + "' AND date = '" + date + "'";
     var cursor = db.rawQuery(sql, null);
     var res = cursor.moveToFirst();
@@ -111,6 +119,12 @@ function getLearnedArticle(title, date) {
 function insertLearnedArticle(title, date) {
     rtitle = title.replace("'", "''");
     var db = SQLiteDatabase.openOrCreateDatabase(path, null);
+    var createTable = "\
+    CREATE TABLE IF NOt EXISTS learnedArticles(\
+    title CHAR(253),\
+    date CHAR(100)\
+    );";
+    db.execSQL(createTable);
     var sql = "INSERT INTO learnedArticles VALUES ('" + user + rtitle + "','" + date + "')";
     db.execSQL(sql);
     db.close();
@@ -1965,7 +1979,6 @@ function SRQuestion() {
  * @param: null
  * @return: null
  */
-
 function zsyQuestionLoop() {
     let ClickAnswer;
     while (className("ListView").exists() && !text("继续挑战").exists()) {
@@ -2803,16 +2816,20 @@ function xx6() {
 }
 
 function xx7() {
-    if (myScores['每周答题'] == 0) {//无分值即尝试答题
-        logDefault("正在准备每周答题");
-        weeklyQuestion();//每周答题
+    if (weekdt) {
+        if (myScores['每周答题'] == 0) {//无分值即尝试答题
+            logDefault("正在准备每周答题");
+            weeklyQuestion();//每周答题
+        }
     }
 }
 
 function xx8() {
-    if (myScores['专项答题'] == 0) {//无分值即尝试答题
-        logDefault("正在准备专项答题");
-        specialQuestion();//专项答题
+    if (specialdt) {
+        if (myScores['专项答题'] == 0) {//无分值即尝试答题
+            logDefault("正在准备专项答题");
+            specialQuestion();//专项答题
+        }
     }
 }
 

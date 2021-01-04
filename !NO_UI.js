@@ -45,7 +45,7 @@ var bakpath = "/sdcard/Download/";  //备份目录，配置文件也保存在该
 
 var DLog;//记录内容推送用
 //配置文件config
-var xxset = JSON.parse(files.read(bakpath + "config.json"));
+var xxset = JSON.parse(files.read(bakpath + "config.txt"));
 
 //全局函数
 //日志记录和弹出提示

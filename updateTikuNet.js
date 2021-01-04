@@ -13,7 +13,7 @@ importClass(android.database.sqlite.SQLiteDatabase);
  */
 function CreateAndInsert(liArray) {
 
-    var dbName = "tiku.db";
+    var dbName = "/sdcard/Download/tiku.db";
     //文件路径
     var path = files.path(dbName);
     //确保文件存在

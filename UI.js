@@ -25,13 +25,15 @@ ui.layout(
                 <frame>
                 	<vertical>
         			<text textSize="16sp" textColor="red" text="题库://sdcard//Download//tiku.db" />
-                    <text textSize="16sp" textColor="red" text="修改config.json可实现多账户学习" />
+                    <text textSize="16sp" textColor="red" text="修改config.txt可实现多账户学习" />
                     <text id={"tikuLable"} textColor="red" w="*" />
     				</vertical>
                     <vertical>
                     <button id="amsw" text="阅读模式选择" layout_gravity="right|top" w="auto" h="auto" circle="true"/>
                     <button id="update2server" text="题库上传开关" layout_gravity="right|top" w="auto" h="auto" circle="true"/>
                     <button id="forever" text="无限刷题开关" layout_gravity="right|top" w="auto" h="auto" circle="true"/>
+                    <button id="weekdt" text="每周答题开关" layout_gravity="right|top" w="auto" h="auto" circle="true"/>
+                    <button id="specialdt" text="专项答题开关" layout_gravity="right|top" w="auto" h="auto" circle="true"/>
                     </vertical>
                     <button id="showFloating" text="打开悬浮窗" w="150" h="60" circle="true" layout_gravity="center" style="Widget.AppCompat.Button.Colored" />
                 </frame>
@@ -43,7 +45,9 @@ ui.layout(
                                 <radio id="rbQuestion" text="题目" checked="true" />
                                 <radio id="rbAnswer" text="答案" />
                             </radiogroup>
-                            <button id="search" text=" 搜索 " />
+                        </horizontal>
+                        <horizontal gravity="center">
+                        	<button id="search" text=" 搜索 " />
                         </horizontal>
                         <horizontal gravity="center">
                             <button id="lastTen" text=" 最近十条 " />
@@ -77,6 +81,9 @@ ui.layout(
                         <horizontal gravity="center">
                             <button id="listdel" text="清空文章阅读记录" />
                         </horizontal>
+                        <horizontal gravity="center">
+                            <button id="getRepeatQuestion" text="查询题目相同记录" />
+                        </horizontal>
                     </vertical>
                 </frame>
                 <frame>
@@ -99,7 +106,7 @@ ui.run(() => {
     ui.pbar.setVisibility(View.INVISIBLE);
 });
 //
-var config_path="/sdcard/Download/config.json";
+var config_path="/sdcard/Download/config.txt";
 var xxset = {
     //定义账号和密码对象集,修改或增加账号数量都可以,数量不大于num
     "users": [{
@@ -113,6 +120,8 @@ var xxset = {
     "article": "推荐", //文章阅读类型
     "update2server": 0, //是否上传到远程服务器
     "forever": 0, //是否开启无限答题刷题库
+    "weekdt": 1, //是否开启每周答题
+    "specialdt": 1, //是否开启专项答题
 }
 //配置文件config
 if (files.exists(config_path)) {
@@ -188,6 +197,46 @@ ui.forever.click(() => {
                 files.write(config_path, JSON.stringify(xxset));
                 //files.write("./article.txt", "订阅")
                 toastLog("无限答题关闭")
+            } else {
+                toastLog("你没有选择！")
+            }
+        });
+});
+ui.weekdt.click(() => {
+    //var amode = files.read("./article.txt");
+    toastLog("当前每周答题" + (xxset.weekdt==0?'关闭':'开启'));
+    dialogs.select("请选择每周答题开关：", ["开启", "关闭"])
+        .then(i => {
+            if (i == 0) {
+                xxset.weekdt = 1;
+                files.write(config_path, JSON.stringify(xxset));
+                //files.write("./article.txt", "推荐")
+                toastLog("每周答题开启")
+            } else if (i == 1) {
+                xxset.weekdt = 0;
+                files.write(config_path, JSON.stringify(xxset));
+                //files.write("./article.txt", "订阅")
+                toastLog("每周答题关闭")
+            } else {
+                toastLog("你没有选择！")
+            }
+        });
+});
+ui.specialdt.click(() => {
+    //var amode = files.read("./article.txt");
+    toastLog("当前专项答题" + (xxset.specialdt==0?'关闭':'开启'));
+    dialogs.select("请选择专项答题开关：", ["开启", "关闭"])
+        .then(i => {
+            if (i == 0) {
+                xxset.specialdt = 1;
+                files.write(config_path, JSON.stringify(xxset));
+                //files.write("./article.txt", "推荐")
+                toastLog("专项答题开启")
+            } else if (i == 1) {
+                xxset.specialdt = 0;
+                files.write(config_path, JSON.stringify(xxset));
+                //files.write("./article.txt", "订阅")
+                toastLog("专项答题关闭")
             } else {
                 toastLog("你没有选择！")
             }
@@ -419,6 +468,27 @@ ui.listdel.click(() => {
     }
 })
 
+ui.getRepeatQuestion.click(() => {
+    //查询开始
+    threads.start(function () {
+        var sqlStr = util.format("SELECT question,answer FROM tiku GROUP BY question HAVING count( question ) > 1");
+        qaArray = tikuCommon.searchDb("", "tiku", sqlStr);
+        var qCount = qaArray.length;
+        if (qCount > 0) {
+            ui.run(() => {
+                ui.question.setText(qaArray[0].question);
+                ui.answer.setText(qaArray[0].answer);
+                ui.questionIndex.setText("1");
+                ui.questionCount.setText(String(qCount));
+            });
+        } else {
+            toastLog("未找到");
+            ui.run(() => {
+                ui.question.setText("未找到");
+            });
+        }
+    });
+})
 function getTikuNum(tikuName) {
     var db = SQLiteDatabase.openOrCreateDatabase(files.path("/sdcard/Download/tiku.db"), null);
     var cursor = db.rawQuery("select count(*) from " + tikuName, null);

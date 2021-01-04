@@ -6,7 +6,7 @@ var ziXingTi = "选择词语的正确词形。"; //字形题，已定义为全�
 var zsyDelay = 20; //定义争上游答题延时时间，示例为0-100的随机值，参考某些学习工具的延时时间为100ms，即0.1秒
 
 var path = files.path("/sdcard/Download/tiku.db");
-var xxset = JSON.parse(files.read("/sdcard/Download/config.json"));
+var xxset = JSON.parse(files.read("/sdcard/Download/config.txt"));
 function updateToServer(question, answer) {
     //上传到服务器
     if (xxset.update2server) {
